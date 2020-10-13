@@ -3,6 +3,8 @@ package br.com.sales.domain;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Builder
@@ -13,13 +15,14 @@ public class SaleReport {
 
     private Integer customerQty = 0;
     private Integer salesManQty = 0;
-    private BigDecimal mostExpensiveSale = BigDecimal.ZERO;
+    private Sale mostExpensiveSale;
 
     @Getter(AccessLevel.PRIVATE)
     @Setter(AccessLevel.PRIVATE)
     private BigDecimal mostCheapSale = BigDecimal.ZERO;
 
     private SalesMan worstSalesMan;
+    private final List<Sale> sales = new ArrayList<>();
 
     public void incrementCustomer() {
         customerQty++;
@@ -30,11 +33,14 @@ public class SaleReport {
     }
 
     public void updateMostExpensiveSale(Sale sale) {
+        if (this.mostExpensiveSale == null) {
+            this.mostExpensiveSale = sale;
+        }
         BigDecimal saleAmount = sale.getSaleItems().stream()
                 .map(SaleItem::getPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        if (mostExpensiveSale.compareTo(saleAmount) < 0) {
-            this.mostExpensiveSale = saleAmount;
+        if (mostExpensiveSale.getTotal().compareTo(saleAmount) < 0) {
+            this.mostExpensiveSale = sale;
         }
         updateWorstSalesMan(sale, saleAmount);
     }

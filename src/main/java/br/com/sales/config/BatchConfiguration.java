@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.io.IOException;
+
 @EnableBatchProcessing
 @Configuration
 public class BatchConfiguration {
@@ -38,7 +40,7 @@ public class BatchConfiguration {
     private SaleReportWriter saleReportWriter;
 
     @Bean
-    public Job salesJob() {
+    public Job salesJob() throws IOException {
         return jobBuilder.get("salesJob")
                 .incrementer(new RunIdIncrementer())
                 .listener(jobExecutingListener)
@@ -48,15 +50,12 @@ public class BatchConfiguration {
     }
 
     @Bean
-    public Step salesStep1() {
+    public Step salesStep1() throws IOException {
         return stepBuilder.get("salesStep1")
                 .<SaleReport, SaleReport>chunk(10)
-                .reader(saleReportReader.reader())
+                .reader(saleReportReader.multiResourceItemReader())
                 .processor(saleReportItemProcessor)
-                .writer(saleReportWriter)
-//                .faultTolerant()
-//                .skip(FlatFileParseException.class)
-//                .skipPolicy(new AlwaysSkipItemSkipPolicy())
+                .writer(saleReportWriter.itemWriter())
                 .build();
     }
 

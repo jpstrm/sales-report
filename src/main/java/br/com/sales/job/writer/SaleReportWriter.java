@@ -2,46 +2,40 @@ package br.com.sales.job.writer;
 
 import br.com.sales.config.SalesConfiguration;
 import br.com.sales.domain.SaleReport;
+import br.com.sales.service.SalesReportService;
+import org.springframework.batch.item.file.FlatFileFooterCallback;
 import org.springframework.batch.item.file.FlatFileItemWriter;
-import org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor;
-import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
-import org.springframework.batch.item.file.transform.FieldExtractor;
-import org.springframework.batch.item.file.transform.LineAggregator;
-import org.springframework.batch.item.support.AbstractItemStreamItemWriter;
+import org.springframework.batch.item.file.builder.FlatFileItemWriterBuilder;
+import org.springframework.batch.item.file.transform.PassThroughLineAggregator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @Component
-public class SaleReportWriter extends AbstractItemStreamItemWriter<SaleReport> {
+public class SaleReportWriter {
 
     @Autowired
     private SalesConfiguration salesConfig;
 
-    @Override
-    public void write(List<? extends SaleReport> items) throws Exception {
-        FlatFileItemWriter<SaleReport> itemWriter = new FlatFileItemWriter<>();
-        itemWriter.setResource(new FileSystemResource(salesConfig.getPathOut() + "/data.done.dat"));
-        itemWriter.setAppendAllowed(true);
-        itemWriter.setLineAggregator(createSaleReportLineAggregator());
+    @Autowired
+    private SalesReportService salesReportService;
+
+    @Bean
+    public FlatFileItemWriter<SaleReport> itemWriter() {
+        String path = System.getProperty(salesConfig.getPath()) + salesConfig.getPathOut() + "/data.done.dat";
+
+        return  new FlatFileItemWriterBuilder<SaleReport>()
+                .name("saleReportItemWriter")
+                .resource(new FileSystemResource(path))
+                .lineAggregator(new PassThroughLineAggregator<>())
+                .footerCallback(getFooterCallback())
+                .build();
     }
 
-    private LineAggregator<SaleReport> createSaleReportLineAggregator() {
-        DelimitedLineAggregator<SaleReport> lineAggregator = new DelimitedLineAggregator<>();
-        lineAggregator.setDelimiter(";");
-        lineAggregator.setFieldExtractor(getFieldExtractor());
-
-        return lineAggregator;
-    }
-
-    private FieldExtractor<SaleReport> getFieldExtractor() {
-        return new BeanWrapperFieldExtractor<>(){
-            {
-                setNames(new String[] { "name", "test", "test2" });
-            }
-        };
+    @Bean
+    private FlatFileFooterCallback getFooterCallback() {
+        return writer -> salesReportService.write(writer);
     }
 
 }

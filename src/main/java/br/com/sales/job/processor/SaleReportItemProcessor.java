@@ -13,7 +13,7 @@ public class SaleReportItemProcessor implements ItemProcessor<SaleReport, SaleRe
     public SaleReport process(SaleReport item) {
         log.info("Processing SaleReport {}", item);
 
-        return item;
+        return null;
     }
 
 }

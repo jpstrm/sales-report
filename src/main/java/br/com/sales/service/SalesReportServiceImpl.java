@@ -8,7 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.io.IOException;
+import java.io.Writer;
 
 import static br.com.sales.helper.Helper.CUSTOMER_TYPE;
 import static br.com.sales.helper.Helper.SALES_MAN_TYPE;
@@ -26,14 +27,7 @@ public class SalesReportServiceImpl implements SalesReportService {
     private final SaleReport saleReport = new SaleReport();
 
     @Override
-    public String read(String path) {
-        validateExtension(path);
-
-        return null;
-    }
-
-    @Override
-    public SaleReport process(FieldSet fieldSet) {
+    public SaleReport read(FieldSet fieldSet) {
         switch (fieldSet.readString(0)) {
             case CUSTOMER_TYPE:
                 saleReport.incrementCustomer();
@@ -48,16 +42,22 @@ public class SalesReportServiceImpl implements SalesReportService {
             default:
                 throw new IllegalArgumentException("Invalid data type");
         }
-
         return saleReport;
     }
 
     @Override
-    public void write(List<SaleReport> saleReports, String path, String fileName) {
-
+    public void write(Writer writer) throws IOException {
+        writer.append("Quantidade de clientes no arquivo de entrada: ")
+                .append(String.valueOf(saleReport.getCustomerQty())).append("\n");
+        writer.append("Quantidade de vendedor no arquivo de entrada: ")
+                .append(String.valueOf(saleReport.getCustomerQty())).append("\n");
+        writer.append("ID da venda mais cara: ")
+                .append(String.valueOf(saleReport.getMostExpensiveSale().getId())).append("\n");
+        writer.append("O pior vendedor: ")
+                .append(String.valueOf(saleReport.getWorstSalesMan().getName())).append("\n");
     }
 
-    private void validateExtension(String path) {
+    public void validateExtension(String path) {
         if (!path.toLowerCase().endsWith(allowedExtension)) {
             String errorMsg = new StringBuilder()
                     .append("This file is not allowed. ")

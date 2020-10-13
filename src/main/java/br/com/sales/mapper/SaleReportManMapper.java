@@ -15,7 +15,7 @@ public class SaleReportManMapper implements FieldSetMapper<SaleReport> {
 
     @Override
     public SaleReport mapFieldSet(FieldSet fieldSet) {
-        return salesReportService.process(fieldSet);
+        return salesReportService.read(fieldSet);
     }
 
 }
