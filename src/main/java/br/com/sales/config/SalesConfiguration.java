@@ -15,6 +15,7 @@ public class SalesConfiguration {
     private String delimiterItem;
     private String delimiterItemField;
     private String allowedExtension;
+    private String fileExtensionPattern;
     private String path;
     private String pathIn;
     private String pathOut;

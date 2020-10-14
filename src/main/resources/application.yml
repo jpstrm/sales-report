@@ -11,6 +11,7 @@ config:
   delimiterItem: ","
   delimiterItemField: "-"
   allowed-extension: '.dat'
+  file-extension-pattern: '*.dat'
   path: user.home
   path-in: /data/in
   path-out: /data/out

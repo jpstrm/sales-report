@@ -9,16 +9,15 @@ import org.springframework.batch.item.file.MultiResourceItemReader;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.core.io.support.ResourcePatternUtils;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-@Component
+@Configuration
 public class SaleReportReader {
 
     @Autowired
@@ -30,20 +29,20 @@ public class SaleReportReader {
     @Autowired
     private SalesReportService salesReportService;
 
-    @Autowired
-    private ResourceLoader resourceLoader;
+    @Value("file:#{systemProperties['${config.path}']}${config.path-in}/${config.file-extension-pattern}")
+    private Resource[] resources;
 
     @Bean
     public MultiResourceItemReader<SaleReport> multiResourceItemReader() throws IOException {
-        Resource[] inputFiles = getResources();
+        Resource[] inputFiles = resources;
         MultiResourceItemReader<SaleReport> resourceItemReader = new MultiResourceItemReader<>();
         resourceItemReader.setResources(inputFiles);
         resourceItemReader.setDelegate(reader());
         return resourceItemReader;
     }
 
+    @Bean
     public FlatFileItemReader<SaleReport> reader() {
-        System.out.println("reading");
         String path = System.getProperty(salesConfig.getPath()) + salesConfig.getPathIn() + "/data.dat";
         salesReportService.validateExtension(path);
 
@@ -57,11 +56,6 @@ public class SaleReportReader {
         reader.setLineMapper(lineMapper);
 
         return reader;
-    }
-
-    Resource[] getResources() throws IOException {
-        final String path = System.getProperty(salesConfig.getPath()) + salesConfig.getPathIn() + "/*.dat";
-        return ResourcePatternUtils.getResourcePatternResolver(resourceLoader).getResources(path);
     }
 
 }
