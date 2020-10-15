@@ -19,7 +19,9 @@ public class SalesBatchApplication implements CommandLineRunner {
     public WatcherService watcherService;
 
     public static void main(String[] args) {
+
         ConfigurableApplicationContext context = SpringApplication.run(SalesBatchApplication.class, args);
+
         try {
             context.getBean("watchService");
         } catch (NoSuchBeanDefinitionException exception) {

@@ -20,6 +20,7 @@ import java.util.List;
 public class Sale {
 
     private Long id;
+    @Builder.Default
     private List<SaleItem> saleItems = new ArrayList<>();
     private SalesMan salesMan;
     private BigDecimal total;

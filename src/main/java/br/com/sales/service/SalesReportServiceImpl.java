@@ -50,7 +50,7 @@ public class SalesReportServiceImpl implements SalesReportService {
         writer.append("Quantidade de clientes no arquivo de entrada: ")
                 .append(String.valueOf(saleReport.getCustomerQty())).append("\n");
         writer.append("Quantidade de vendedor no arquivo de entrada: ")
-                .append(String.valueOf(saleReport.getCustomerQty())).append("\n");
+                .append(String.valueOf(saleReport.getSalesManQty())).append("\n");
         writer.append("ID da venda mais cara: ")
                 .append(String.valueOf(saleReport.getMostExpensiveSale().getId())).append("\n");
         writer.append("O pior vendedor: ")
